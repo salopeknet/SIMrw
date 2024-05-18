@@ -1,3 +1,3 @@
-libpcsclite-dev
+pcsc-lite
 swig
 pySCard
