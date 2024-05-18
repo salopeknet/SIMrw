@@ -219,7 +219,6 @@ def usim_write(reader_nb, records, pin):
 
     return written_records
 
-#General
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Read from or write to a USIM card.')
     group = parser.add_mutually_exclusive_group(required=True)
@@ -234,6 +233,10 @@ if __name__ == "__main__":
     if args.read:
         usim_read(args.reader_nb, args.csv_file, args.pin)
     elif args.write:
+        if not os.path.isfile(args.csv_file):
+            print(f"\nERROR: The CSV file '{args.csv_file}' doesn't exist. Please check filename/path.\nAborting operation.\n")
+            sys.exit(1)
+        
         records = get_records_from_csv(args.csv_file)
         written_records = usim_write(args.reader_nb, records, args.pin)
         print(f"\nREADY!\nSuccessfully written {written_records} records to SIM card.\n")
