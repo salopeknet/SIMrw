@@ -86,9 +86,11 @@ def usim(reader_nb, pin=None):
         except Exception as e:
             print(f"ERROR: {e}")
             sys.exit(1)
-    else:
-        print(f"ERROR: No PIN provided, but a PIN is required.\nPlease enter valid PIN with '-p xxxx' and start again.\nAborting operation.\n")
-        sys.exit(1)
+
+# Doesn't work. Remove?
+#    else:
+#        print(f"ERROR: No PIN provided, but a PIN is required.\nPlease enter valid PIN with '-p xxxx' and start again.\nAborting operation.\n")
+#        sys.exit(1)
 
     return size, connection
 
@@ -224,7 +226,7 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-r', '--read', action='store_true', help='Read from the USIM card')
     group.add_argument('-w', '--write', action='store_true', help='Write to the USIM card')
-    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card')
+    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
     parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0)')
 
