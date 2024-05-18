@@ -45,7 +45,6 @@ jobs:
 
       - name: Install Dependencies for All
         run: |
-          pip install swig
           pip install -r requirements.txt
           
       - name: Build Executable for ${{runner.os}}
