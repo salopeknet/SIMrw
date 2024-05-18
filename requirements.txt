@@ -1,1 +1,4 @@
+pcscd
+libpcsclite-dev
+swig
 pySCard
