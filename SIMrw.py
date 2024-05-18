@@ -98,8 +98,24 @@ def usim(reader_nb, pin=None):
 #Reading
 
 def decode_record(record):
+
     X = len(record) - 14
-    name = toASCIIString(record[0:X - 1]).replace("ÿ", "").strip(".")
+
+# now follows a quick and dirty fix for german "ß"
+    umlaute = {30: 125}  	# replaces 30 with "}" for later conversion to "ß" #{123: 228, 124: 246, 126: 252, 91: 196, 92: 214, 94: 220, 30: 223} äöüÄÖÜß Add more replacements as needed
+    name_bytes = [umlaute.get(byte, byte) for byte in (record[0:X - 1])]
+
+#default
+#    name_bytes = record[0:X - 1]
+
+# quick and dirty fix for an "." at the end of a name
+
+    # Check for "." at the end of name_bytes (0x2E, 0xFF)
+    if any(name_bytes[i] == 46 and name_bytes[i + 1] == 255 for i in range(len(name_bytes) - 1)):
+        name = toASCIIString(name_bytes[:-1]).strip("ÿ").strip(".") + "."
+    else:
+        name = toASCIIString(name_bytes).strip("ÿ").strip(".")
+ 
     name = name.replace("{", "ä").replace("[", "Ä").replace("|", "ö").replace("\\", "Ö").replace("~", "ü").replace("^", "Ü").replace("}", "ß")
 
     tel_size = record[X]
