@@ -2,7 +2,7 @@
 Little tool for reading or writing GSM phonebooks as CSV to/from a USIM card with an PC/SC
 compatible reader.
 
-Command line only, tested on macOS & Windows. More to come. Perhaps. :)
+Command line only. More to come. Perhaps. :)
 
 ### Usage (more description to come):
 ```
@@ -25,9 +25,14 @@ options:
   -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted. CAUTION:
                      There is no fail counter yet!)
 ```
+> [!NOTE]
+> The downloadable executables are tested on Windows 10 and macOS Sonoma. Perhaps I won't update them regularily.
+> If you know how, better use the Python script natively. 
 
 ### Format of CSV-file:
-Either read ut a SIM phonebook first and have a look at the created CSV-file.
+Either read out a SIM phonebook first and have a look at or edit the created CSV-file.
+Please avoid using Excel for CSV-editing, because it does funny things with CSV-data...
+
 Or start a new one like in this example:
 ```
 1;Name1;+491711234567
@@ -41,4 +46,3 @@ Max. chars in name is 17 (I think). No header line. Delimiter is ';'
 > [!NOTE]
 > The conversion of the GSM 7-bit charset is a pain in the ass and I haven't found a nice solution yet.
 > For now in 'name' only ASCII-chars and german "Umlauts" (äöüÄÖÜß) are allowed.
-> [!NOTE]
