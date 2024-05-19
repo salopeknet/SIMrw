@@ -45,8 +45,9 @@ jobs:
             **/requirements*.txt
 
       - name: Install SWIG
-        uses: mmomtchev/setup-swig@v1
-        
+#        uses: mmomtchev/setup-swig@v1
+        uses: johnwason/swig-build-action@v1
+
       - name: Verify SWIG
         run: swig -version
 
