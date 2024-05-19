@@ -44,21 +44,17 @@ jobs:
           cache-dependency-path: |
             **/requirements*.txt
             
-#      - name: Install APT & co
-#        uses: lyricwulf/abc@v1
-#        with:
-#          windows: lib-from-choco
-#          macos: lib-from-brew
-#          linux: libfoo
-
-
-#      - name: Install SWIG
-#        uses: mmomtchev/setup-swig@v1
-#        uses: johnwason/swig-build-action@v1
-
-#      - name: Verify SWIG
-#        run: swig -version
-
+      - name: setup prerequisites from lr
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt install libpcsclite-dev python3-all-dev python3-setuptools swig
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install swig
+          else
+            echo "$RUNNER_OS not supported"
+            exit 1
+          fi
       - name: Install Dependencies for All
         run: |
           pip install -r requirements.txt
