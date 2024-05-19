@@ -4,10 +4,11 @@ import sys
 import os
 import csv
 import argparse
-from smartcard.util import toBytes, toASCIIString, padd
-from smartcard.System import readers
-from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
-from smartcard.Exceptions import NoReadersException, CardConnectionException
+import smartcard
+#from smartcard.util import toBytes, toASCIIString, padd
+#from smartcard.System import readers
+#from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
+#from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
 version = "0.1.0"
