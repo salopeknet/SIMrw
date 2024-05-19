@@ -67,8 +67,7 @@ jobs:
           file-version: ${{github.event.inputs.mytag}}
           onefile: true
           output-file: SIMrw-${{runner.os}}
-          include-data-dir: true
-
+         
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
