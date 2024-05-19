@@ -9,6 +9,9 @@ from smartcard.System import readers
 from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
+# Version information
+version = "0.1.0"
+
 #USIM setup
 
 debug = False
@@ -18,7 +21,8 @@ def usim(reader_nb, pin=None):
         # get all the available readers
         r = readers()
         if not r:
-            raise NoReadersException("No smart card readers found.")
+            print(f"\nERROR: No smart card readers detected.\nPlease ensure that your reader is properly connected and try again.\n")
+            sys.exit(1)
     except NoReadersException as e:
         print(f"Error: {e}")
         sys.exit(1)
@@ -26,10 +30,10 @@ def usim(reader_nb, pin=None):
     try:
         reader = r[reader_nb]
     except IndexError:
-        print(f"Error: Reader number {reader_nb} is not available. Please select a valid reader.")
+        print(f"\nERROR: Reader number {reader_nb} is not available.\nPlease select a valid reader.\n")
         sys.exit(1)
 
-    print("\nUsing:", reader, "\n")
+    print("Using:", reader, "\n")
 
     try:
         connection = reader.createConnection()
@@ -38,7 +42,7 @@ def usim(reader_nb, pin=None):
             connection.addObserver(observer)
         connection.connect()
     except CardConnectionException as e:
-        print(f"\nERROR: Unable to connect to the reader.\nDetails: {e}\nPossible Fix: Try to unplug and replug the reader.\n")
+        print(f"ERROR: Unable to connect to the reader.\nDetails: {e}\nPossible Fix: Try to unplug and replug the reader.\n")
         sys.exit(1)
 
     SELECT = "A0 A4 00 00 02 "
@@ -87,11 +91,6 @@ def usim(reader_nb, pin=None):
             print(f"ERROR: {e}")
             sys.exit(1)
 
-# Doesn't work. Remove?
-#    else:
-#        print(f"ERROR: No PIN provided, but a PIN is required.\nPlease enter valid PIN with '-p xxxx' and start again.\nAborting operation.\n")
-#        sys.exit(1)
-
     return size, connection
 
 
@@ -109,13 +108,13 @@ def decode_record(record):
 #    name_bytes = record[0:X - 1]
 
 # quick and dirty fix for an "." at the end of a name
-
-    # Check for "." at the end of name_bytes (0x2E, 0xFF)
+    # Checking for "." at the end of name_bytes (0x2E, 0xFF) to preserve it
     if any(name_bytes[i] == 46 and name_bytes[i + 1] == 255 for i in range(len(name_bytes) - 1)):
         name = toASCIIString(name_bytes[:-1]).strip("ÿ").strip(".") + "."
     else:
         name = toASCIIString(name_bytes).strip("ÿ").strip(".")
- 
+
+# dirty fix for conversion of German Umlauts
     name = name.replace("{", "ä").replace("[", "Ä").replace("|", "ö").replace("\\", "Ö").replace("~", "ü").replace("^", "Ü").replace("}", "ß")
 
     tel_size = record[X]
@@ -144,7 +143,7 @@ def usim_read(reader_nb, csv_filename, pin):
     if os.path.isfile(csv_filename):
         overwrite = input(f"The CSV file '{csv_filename}' already exists. Do you want to overwrite it? (y/n): ").strip().lower()
         if overwrite != 'y':
-            print("Aborting read operation.")
+            print("\nAborted read operation. Please start again.\n")
             return
 
     (size, connection) = usim(reader_nb, pin)
@@ -238,13 +237,16 @@ def usim_write(reader_nb, records, pin):
     return written_records
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Read from or write to a USIM card.')
+
+    print(f"\n*** SIMrw v{version} by Micha Salopek (based on the work of Ludovic Rousseau) ***\nsee: https://github.com/salopeknet/SIMrw\n")
+
+    parser = argparse.ArgumentParser(description='Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-r', '--read', action='store_true', help='Read from the USIM card')
-    group.add_argument('-w', '--write', action='store_true', help='Write to the USIM card')
-    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card', default=None)
+    group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
+    group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
+    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted. CAUTION: There is no fail counter yet!)', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
-    parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0)')
+    parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0 if omitted)')
 
     args = parser.parse_args()
 
