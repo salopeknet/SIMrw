@@ -43,6 +43,14 @@ jobs:
           cache: 'pip'
           cache-dependency-path: |
             **/requirements*.txt
+      - name: Install APT & co
+        uses: actions/checkout@v2
+        uses: lyricwulf/abc@v1
+        with:
+#          windows: lib-from-choco
+          macos: lib-from-brew
+#          linux: libfoo
+
 
       - name: Install SWIG
 #        uses: mmomtchev/setup-swig@v1
