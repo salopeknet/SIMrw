@@ -46,9 +46,9 @@ jobs:
             
       - name: Install APT & co
         uses: lyricwulf/abc@v1
-        with:
+#        with:
 #          windows: lib-from-choco
-          macos: lib-from-brew
+#          macos: lib-from-brew
 #          linux: libfoo
 
 
