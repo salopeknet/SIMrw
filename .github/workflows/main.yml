@@ -53,7 +53,7 @@ jobs:
             brew install swig
           else
             echo "$RUNNER_OS not supported"
-            exit 1
+            #exit 1
           fi
       - name: Install Dependencies for All
         run: |
