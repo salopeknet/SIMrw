@@ -44,20 +44,20 @@ jobs:
           cache-dependency-path: |
             **/requirements*.txt
             
-      - name: Install APT & co
-        uses: lyricwulf/abc@v1
+#      - name: Install APT & co
+#        uses: lyricwulf/abc@v1
 #        with:
 #          windows: lib-from-choco
 #          macos: lib-from-brew
 #          linux: libfoo
 
 
-      - name: Install SWIG
+#      - name: Install SWIG
 #        uses: mmomtchev/setup-swig@v1
-        uses: johnwason/swig-build-action@v1
+#        uses: johnwason/swig-build-action@v1
 
-      - name: Verify SWIG
-        run: swig -version
+#      - name: Verify SWIG
+#        run: swig -version
 
       - name: Install Dependencies for All
         run: |
