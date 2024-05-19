@@ -1,3 +1,1 @@
-pcsc-lite
-swig
 pySCard
