@@ -65,16 +65,17 @@ jobs:
           script-name: SIMrw.py
           company-name: salopeknet
           file-version: ${{github.event.inputs.mytag}}
-          onefile: true
-          onefile-tempdir-spec: .SIMrw-${{runner.os}}
-          output-file: SIMrw-${{runner.os}}
-         
+          onefile: false
+          # onefile-tempdir-spec: .SIMrw-${{runner.os}}
+          # output-file: SIMrw-${{runner.os}}
+          output-dir: SIMrw-${{runner.os}}
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{runner.os}} Build
           if-no-files-found: warn
-          path: 'build/SIMrw-${{runner.os}}**'
+          path: SIMrw-${{runner.os}}/SIMrw.dist/
             
       - name: Create Release ${{github.event.inputs.mytag}} with Builds from Nuitka
         uses: ncipollo/release-action@v1
