@@ -26,11 +26,19 @@ options:
                      There is no fail counter yet!)
 ```
 > [!NOTE]
-> The downloadable executables are tested on Windows 10 and macOS Sonoma. Perhaps I won't update them regularily.
+> The downloadable executables are tested on Windows 10 and macOS Sonoma.
 > If you know how, better use the Python script natively. 
 
+> [!NOTE]
+> Some (Windows-) antivirus could warn you, this is false positive.
+If you do not trust you can still use the Python script.
+
+> [!NOTE]
+> On macOS you'll have to make the downloaded file executable and run it with [option]+[Right Click]->Run the first time to confirm. I think, it should be similar for Linux.
+
+
 ### Format of CSV-file:
-Either read out a SIM phonebook first and have a look at or edit the created CSV-file.
+Either read out a SIM phonebook first and then edit the created CSV-file.
 Please avoid using Excel for CSV-editing, because it does funny things with CSV-data...
 
 Or start a new one like in this example:
