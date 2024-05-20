@@ -83,4 +83,4 @@ jobs:
           allowUpdates: true
           commit: main
           tag: ${{github.event.inputs.mytag}}
-          artifacts: 'build/SIMrw-${{runner.os}}**'
+          artifacts: SIMrw-${{runner.os}}/SIMrw.dist/
