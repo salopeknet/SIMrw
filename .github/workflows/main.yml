@@ -26,8 +26,7 @@ jobs:
       contents: write
     strategy:
       matrix:
-        #os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [macos-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         
     runs-on: ${{matrix.os}}
    
