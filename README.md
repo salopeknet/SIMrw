@@ -34,7 +34,8 @@ options:
 If you do not trust you can still use the Python script.
 
 > [!NOTE]
-> On macOS you'll have to make the downloaded file executable and run it with [option]+[Right Click]->Run the first time to confirm. I think, it should be similar for Linux.
+> On macOS you'll have to make the downloaded file executable and run it with [option]+[Right Click]->Run the first time to confirm.<br>
+> If you prefer Terminal, type in the folder where you have downloaded SIMrw-macOS to:<br>```xattr -r -d com.apple.quarantine ./SIMrw-macOS``` followed by<br>```chmod +x ./SIMrw-macOS```.<br>Furthermore if you want to shorten the name type<br>```mv ./SIMrw-macOS ./SIMrw```<br>I think, it should be similar for Linux.
 
 
 ### Format of CSV-file:
