@@ -4,14 +4,14 @@ import sys
 import os
 import csv
 import argparse
-#import smartcard
-from smartcard.util import toBytes, toASCIIString, padd
+from smartcard.util import toBytes, padd
+from smartcard.util import __dic_GSM_3_38__ as char_dict
 from smartcard.System import readers
 from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.1.0"
+version = "0.2.0"
 
 #USIM setup
 
@@ -94,29 +94,23 @@ def usim(reader_nb, pin=None):
 
     return size, connection
 
+# Conversion for GSM-7bit
+def encode_name(name_str):
+    return [char_dict.get(char, ord(char)) for char in name_str]
+
+def decode_name(name_enc):
+    decoded_name = ''
+    for byte in name_enc:
+        decoded_name += next((char for char, value in char_dict.items() if value == byte), chr(byte))
+    return decoded_name
 
 #Reading
 
 def decode_record(record):
-
     X = len(record) - 14
 
-# now follows a quick and dirty fix for german "ß"
-    umlaute = {30: 125}  	# replaces 30 with "}" for later conversion to "ß" #{123: 228, 124: 246, 126: 252, 91: 196, 92: 214, 94: 220, 30: 223} äöüÄÖÜß Add more replacements as needed
-    name_bytes = [umlaute.get(byte, byte) for byte in (record[0:X - 1])]
-
-#default
-#    name_bytes = record[0:X - 1]
-
-# quick and dirty fix for an "." at the end of a name
-    # Checking for "." at the end of name_bytes (0x2E, 0xFF) to preserve it
-    if any(name_bytes[i] == 46 and name_bytes[i + 1] == 255 for i in range(len(name_bytes) - 1)):
-        name = toASCIIString(name_bytes[:-1]).strip("ÿ").strip(".") + "."
-    else:
-        name = toASCIIString(name_bytes).strip("ÿ").strip(".")
-
-# dirty fix for conversion of German Umlauts
-    name = name.replace("{", "ä").replace("[", "Ä").replace("|", "ö").replace("\\", "Ö").replace("~", "ü").replace("^", "Ü").replace("}", "ß")
+    name_bytes = record[0:X - 1]
+    name = decode_name(name_bytes).strip("ÿ")
 
     tel_size = record[X]
     phone = record[X + 2:X + tel_size + 1]
@@ -137,6 +131,12 @@ def decode_record(record):
         phone = "+" + phone
 
     phone = phone.replace('A', '*').replace('B', '#').replace('C', 'p')
+
+    if args.verbose:
+        if not name:
+            print("--EMPTY--")
+        else:
+            print(name, phone)
 
     return name, phone
 
@@ -162,12 +162,16 @@ def usim_read(reader_nb, csv_filename, pin):
             if (sw1, sw2) != (0x90, 0x00):
                 break
 
+            print(f"\rReading record {record_idx}... ", end='', flush=True)
+
+ # Print out the raw record data before decoding
+ #           print(f"\rRaw record {record_idx}: {data}")
+
             name, phone = decode_record(data)
             writer.writerow([record_idx, name, phone])
-            print(f"\rReading record {record_idx}... ", end='', flush=True)
             read_records += 1
 
-    print(f"READY!\nSuccessfully read {read_records} records and wrote to {csv_filename}.\n")
+    print(f"READY!\nSuccessfully read {read_records} records and written to {csv_filename}.\n")
 
 
 #Writing
@@ -182,25 +186,16 @@ def reverse_digits_in_pairs(phone):
     reversed_phone = ''.join([phone[i:i+2][::-1] for i in range(0, len(phone), 2)])
     return reversed_phone
 
-def encode_gsm_7bit(name):
-    gsm_7bit_alphabet = "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà"
-    encoded_name = []
-
-    for char in name:
-        if char in gsm_7bit_alphabet:
-            encoded_char = gsm_7bit_alphabet.index(char) + 1
-            encoded_name.append(encoded_char)
-        else:
-            encoded_name.append(32)
-    return encoded_name
-
 def new_record(index, name, phone, size):
     if not name:
-        print(f"Writing record {index} as EMPTY")
+        if args.verbose:
+            print(f"Writing record {index}... --EMPTY--")
         return [0xFF] * size
 
     name = name[:size-14]
-    print(f"Writing record {index}: {name} {phone}")
+    print(f"\rWriting record {index}... ", end='', flush=True)
+    if args.verbose:
+        print(name, phone)
 
     if phone.startswith("+"):
         phone = phone[1:]
@@ -216,7 +211,7 @@ def new_record(index, name, phone, size):
     phone = reverse_digits_in_pairs(phone)
     phone = phone.replace('*', 'A').replace('#', 'B').replace('p', 'C')
 
-    record = padd(encode_gsm_7bit(name), size-14) + padd(toBytes(f"{phone_prefix} {phone.replace(' ', '')}"), 14)
+    record = padd(encode_name(name), size-14) + padd(toBytes(f"{phone_prefix} {phone.replace(' ', '')}"), 14)
     return record
 
 
@@ -245,6 +240,7 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
     group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Show names & numbers during reading/writing')
     parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted. CAUTION: There is no fail counter yet!)', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
     parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0 if omitted)')
@@ -257,7 +253,7 @@ if __name__ == "__main__":
         if not os.path.isfile(args.csv_file):
             print(f"\nERROR: The CSV file '{args.csv_file}' doesn't exist. Please check filename/path.\nAborting operation.\n")
             sys.exit(1)
-        
         records = get_records_from_csv(args.csv_file)
         written_records = usim_write(args.reader_nb, records, args.pin)
-        print(f"\nREADY!\nSuccessfully written {written_records} records to SIM card.\n")
+        print(f"READY!\nSuccessfully written {written_records} records to SIM card.\n")
+
