@@ -6,13 +6,12 @@ Command line only. More to come. Perhaps. :)
 
 ### Usage (more description to come):
 ```
-*** SIMrw v0.1.0 by Micha Salopek (based on the work of Ludovic Rousseau) ***
+*** SIMrw v0.2.0 by Micha Salopek (based on the work of Ludovic Rousseau) ***
 see: https://github.com/salopeknet/SIMrw
 
-usage: simrw.py [-h] (-r | -w) [-p PIN] csv_file [reader_nb]
+usage: SIMrw.py [-h] (-r | -w) [-v] [-p PIN] csv_file [reader_nb]
 
-Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC
-compatible reader.
+Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.
 
 positional arguments:
   csv_file           CSV file name for reading or writing
@@ -22,8 +21,8 @@ options:
   -h, --help         show this help message and exit
   -r, --read         Read phonebook from the USIM card and save as CSV
   -w, --write        Write CSV phonebook to the USIM card
-  -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted. CAUTION:
-                     There is no fail counter yet!)
+  -v, --verbose      Show names & numbers during reading/writing
+  -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted. CAUTION: There is no fail counter yet!)
 ```
 > [!NOTE]
 > The downloadable executables are tested on Windows 10 and macOS Sonoma.
@@ -47,11 +46,9 @@ Or start a new one like in this example:
 1;Name1;+491711234567
 2;Name2;01727890123
 3;Name3;123456789
+4;;
+5;Name5;987654321
 ...
 ```
 First field/column is the 'index number', second the 'name', third the 'phone number'. 
-Max. chars in name is 17 (I think). No header line. Delimiter is ';' 
-
-> [!NOTE]
-> The conversion of the GSM 7-bit charset is a pain in the ass and I haven't found a nice solution yet.
-> For now in 'name' only ASCII-chars and german "Umlauts" (äöüÄÖÜß) are allowed.
+Max. chars in name is 18 (I think). No header line. Delimiter is ';'. If you have empty records/lines in your CSV, always keep at least the 'index number' (followed by ';;') as a placeholder.
