@@ -6,7 +6,7 @@ Command line only. More to come. Perhaps. :)
 
 ### Usage (more description to come):
 ```
-*** SIMrw v0.2.0 by Micha Salopek (based on the work of Ludovic Rousseau) ***
+*** SIMrw vX.X.X by Micha Salopek (based on the work of Ludovic Rousseau) ***
 see: https://github.com/salopeknet/SIMrw
 
 usage: SIMrw.py [-h] (-r | -w) [-v] [-p PIN] csv_file [reader_nb]
@@ -22,7 +22,7 @@ options:
   -r, --read         Read phonebook from the USIM card and save as CSV
   -w, --write        Write CSV phonebook to the USIM card
   -v, --verbose      Show names & numbers during reading/writing
-  -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted. CAUTION: There is no fail counter yet!)
+  -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted)
 ```
 > [!NOTE]
 > The downloadable executables are tested on Windows 10 and macOS Sonoma.
