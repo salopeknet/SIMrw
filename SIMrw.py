@@ -88,40 +88,43 @@ def usim(reader_nb, pin=None):
 
     size = data[-1]
 
-    if pin is not None:
-        try:
-            # Convert PIN to string of ASCII values
-            pin_str = str(pin)
-            pin_ascii = [ord(c) for c in pin_str]
-            # Pad PIN to 8 bytes if it's less than 8 bytes
-            pin_padded = padd(pin_ascii, 8)
-            # Verify CHV
-            PIN_VERIFY = "A0 20 00 01 08"
-            cmd = toBytes(PIN_VERIFY) + pin_padded
-            data, sw1, sw2 = connection.transmit(cmd)
+#    if pin is not None:
+    try:
+        # Convert PIN to string of ASCII values
+        pin_str = str(pin)
+        pin_ascii = [ord(c) for c in pin_str]
+        # Pad PIN to 8 bytes if it's less than 8 bytes
+        pin_padded = padd(pin_ascii, 8)
+        # Verify CHV
+        PIN_VERIFY = "A0 20 00 01 08"
+        cmd = toBytes(PIN_VERIFY) + pin_padded
+        data, sw1, sw2 = connection.transmit(cmd)
     
-            if (sw1, sw2) == (0x90, 0x00):
-                pass
-            elif (sw1, sw2) == (0x98, 0x08):
+        if (sw1, sw2) == (0x90, 0x00):
+            pass
+        elif (sw1, sw2) == (0x98, 0x08):
+            if pin is not None:
                 print("\n NOTE: PIN was provided, but deactivated on SIM-Card. Continuing.\n\n")
-            elif (sw1, sw2) == (0x98, 0x40):
-                print("\n ERROR: PIN1 is LOCKED! Please unlock first.\n")
-                sys.exit(1)
-            elif (sw1, sw2) == (0x98, 0x04):
-                print("\n ATTENTION: Wrong or missing PIN!!!")
-                PIN_CHECK_REMAINING = "00 20 00 01 00"
-                cmd = toBytes(PIN_CHECK_REMAINING)
-                data, sw1, sw2 = connection.transmit(cmd)
-                if sw2 == 0xC0:
-                    print("\n ERROR: PIN1 is LOCKED. Please unlock first.\n")
-                else:
-                    print(f"\n -> {sw2 & 0x0F} attempt(s) left!\n\n")
-                sys.exit(1)
-            else:
-                raise Exception(f"Unexpected response: sw1={sw1}, sw2={sw2}")
-        except Exception as e:
-            print(f"ERROR: {e}")
+                pass
+            pass
+        elif (sw1, sw2) == (0x98, 0x40):
+            print("\n ERROR: PIN1 is LOCKED! Please unlock first.\n")
             sys.exit(1)
+        elif (sw1, sw2) == (0x98, 0x04):
+            print("\n ATTENTION: Wrong or missing PIN!!!")
+            PIN_CHECK_REMAINING = "00 20 00 01 00"
+            cmd = toBytes(PIN_CHECK_REMAINING)
+            data, sw1, sw2 = connection.transmit(cmd)
+            if sw2 == 0xC0:
+                print("\n ERROR: PIN1 is LOCKED. Please unlock first.\n")
+            else:
+                print(f"\n -> {sw2 & 0x0F} attempt(s) left!\n\n")
+            sys.exit(1)
+        else:
+            raise Exception(f"Unexpected response: sw1={sw1}, sw2={sw2}")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
 
     return size, connection
 
