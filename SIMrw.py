@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.1"
+version = "0.2.2"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -88,22 +88,40 @@ def usim(reader_nb, pin=None):
 
     size = data[-1]
 
-    if pin is not None:
-        try:
-            # Convert PIN to string of ASCII values
-            pin_str = str(pin)
-            pin_ascii = [ord(c) for c in pin_str]
-            # Pad PIN to 8 bytes if it's less than 8 bytes
-            pin_padded = padd(pin_ascii, 8)
-            # Verify CHV
-            VERIFY = "A0 20 00 01 08"
-            cmd = toBytes(VERIFY) + pin_padded
-            data, sw1, sw2 = connection.transmit(cmd)
-            if (sw1, sw2) != (0x90, 0x00):
-                raise Exception(f"Wrong PIN!!!\n\nCAUTION: There is no counter programmed!!! You have only 3 tries at all! How many are still left? ;)\n")
-        except Exception as e:
-            print(f"ERROR: {e}")
+#    if pin is not None:
+    try:
+        # Convert PIN to string of ASCII values
+        pin_str = str(pin)
+        pin_ascii = [ord(c) for c in pin_str]
+        # Pad PIN to 8 bytes if it's less than 8 bytes
+        pin_padded = padd(pin_ascii, 8)
+        # Verify CHV
+        PIN_VERIFY = "A0 20 00 01 08"
+        cmd = toBytes(PIN_VERIFY) + pin_padded
+        data, sw1, sw2 = connection.transmit(cmd)
+    
+        if (sw1, sw2) == (0x90, 0x00):
+            pass
+        elif (sw1, sw2) == (0x98, 0x08):
+            print("\n NOTE: PIN was provided, but deactivated on SIM-Card. Continuing.\n\n")
+        elif (sw1, sw2) == (0x98, 0x40):
+            print("\n ERROR: PIN1 is LOCKED! Please unlock first.\n")
             sys.exit(1)
+        elif (sw1, sw2) == (0x98, 0x04):
+            print("\n ATTENTION: Wrong or missing PIN!!!")
+            PIN_CHECK_REMAINING = "00 20 00 01 00"
+            cmd = toBytes(PIN_CHECK_REMAINING)
+            data, sw1, sw2 = connection.transmit(cmd)
+            if sw2 == 0xC0:
+                print("\n ERROR: PIN1 is LOCKED. Please unlock first.\n")
+            else:
+                print(f"\n -> {sw2 & 0x0F} attempt(s) left!\n\n")
+            sys.exit(1)
+        else:
+            raise Exception(f"Unexpected response: sw1={sw1}, sw2={sw2}")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
 
     return size, connection
 
@@ -254,7 +272,7 @@ if __name__ == "__main__":
     group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
     group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show names & numbers during reading/writing')
-    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted. CAUTION: There is no fail counter yet!)', default=None)
+    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted)', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
     parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0 if omitted)')
 
