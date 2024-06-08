@@ -11,7 +11,20 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.0"
+version = "0.2.1"
+
+# from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
+ascii_logo = """
+      ____ ___ __  __               
+     / ___|_ _|  \/  |_ ____      __
+     \___ \| || |\/| | '__\ \ /\ / /
+      ___) | || |  | | |   \ V  V / 
+     |____/___|_|  |_|_|    \_/\_/  
+                                
+"""
+message_Start = f"\n{ascii_logo}***** SIMrw v{version} by Micha Salopek *****\n(based on the work of Ludovic Rousseau)\nsee: https://github.com/salopeknet/SIMrw\n"
+message_End = f"\n\nProgram exits.\n\nHave a nice day!\n"
+
 
 #USIM setup
 
@@ -234,7 +247,7 @@ def usim_write(reader_nb, records, pin):
 
 if __name__ == "__main__":
 
-    print(f"\n*** SIMrw v{version} by Micha Salopek (based on the work of Ludovic Rousseau) ***\nsee: https://github.com/salopeknet/SIMrw\n")
+    print(message_Start)
 
     parser = argparse.ArgumentParser(description='Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.')
     group = parser.add_mutually_exclusive_group(required=True)
@@ -256,4 +269,3 @@ if __name__ == "__main__":
         records = get_records_from_csv(args.csv_file)
         written_records = usim_write(args.reader_nb, records, args.pin)
         print(f"READY!\nSuccessfully written {written_records} records to SIM card.\n")
-
