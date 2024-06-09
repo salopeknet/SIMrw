@@ -1,6 +1,6 @@
 # Cross-compile workflow that is manually triggered
 
-name: Python-Cross-Compiler BETA
+name: Python-Cross-Compiler
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -84,6 +84,7 @@ jobs:
            chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           elif [ "$RUNNER_OS" == "Windows" ]; then
+           sudo apt-get install zip -y
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && zip -r ${{github.event.inputs.myname}}-${{runner.os}}.zip ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           else
            echo "$RUNNER_OS not supported"
