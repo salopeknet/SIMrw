@@ -76,10 +76,10 @@ jobs:
           output-file: ${{github.event.inputs.myname}}
 
       - name: Make artefact executable
-        run: chmod +x build/${{github.event.inputs.myname}}-${{runner.os}}.dist/${{github.event.inputs.myname}}
+        run: chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
 
       - name: Tar files
-        run: tar -cvf ${{github.event.inputs.myname}}-${{runner.os}}.tar build/${{github.event.inputs.myname}}-${{runner.os}}.dist/${{github.event.inputs.myname}}
+        run: tar -cvf ${{github.event.inputs.myname}}-${{runner.os}}.tar build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
          
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
