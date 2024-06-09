@@ -79,7 +79,7 @@ jobs:
         run: chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
 
       - name: Tar files
-         run: 'cd build/${{github.event.inputs.myname}}.dist/ && tar -zcvf ../../${{github.event.inputs.myname}}-${{runner.os}}.tgz * && cd ../..' 
+        run: cd build/${{github.event.inputs.myname}}.dist/ && tar -zcvf ../../${{github.event.inputs.myname}}-${{runner.os}}.tgz * && cd ../.. 
 #        run: tar -cvf ${{github.event.inputs.myname}}-${{runner.os}}.tar -C build/${{github.event.inputs.myname}}.dist/*
 #        run: tar -cvf ${{github.event.inputs.myname}}-${{runner.os}}.tar build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
          
