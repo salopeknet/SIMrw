@@ -8,6 +8,12 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
+      myname:
+        default: 'SIMrw'
+        description: Script name
+        type: string
+        required: true
+
       mytag:
         # Friendly description to be shown in the UI instead of 'name'
         description: 'Input Tag'
@@ -62,15 +68,15 @@ jobs:
         uses: Nuitka/Nuitka-Action@v1.0
         with:
           nuitka-version: 2.2.3
-          script-name: SIMrw.py
+          script-name: ${{github.event.inputs.myname}}.py
           company-name: salopeknet
           file-version: ${{github.event.inputs.mytag}}
           onefile: false
 #          onefile-tempdir-spec: .SIMrw-${{runner.os}}
-          output-file: SIMrw-${{runner.os}}
+          output-file: ${{github.event.inputs.myname}}-${{runner.os}}
 
       - name: 'Tar files'
-        run: tar -cvf test.tar build/SIMrw.dist/SIMrw-${{runner.os}}
+        run: tar -cvf ${{github.event.inputs.myname}}-${{runner.os}}.tar build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}-${{runner.os}}
          
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -78,7 +84,7 @@ jobs:
           name: ${{runner.os}} Build
           if-no-files-found: warn
 #          path: 'build/SIMrw.dist/SIMrw-${{runner.os}}**'
-          path: test.tar
+          path: ${{github.event.inputs.myname}}-${{runner.os}}.tar
 
       - name: Create Release ${{github.event.inputs.mytag}} with Builds from Nuitka
         uses: ncipollo/release-action@v1
@@ -86,5 +92,5 @@ jobs:
           allowUpdates: true
           commit: main
           tag: ${{github.event.inputs.mytag}}
-          artifacts: 'test.tar'
+          artifacts: '${{github.event.inputs.myname}}-${{runner.os}}.tar'
 #          artifacts: 'build/SIMrw-${{runner.os}}**'
