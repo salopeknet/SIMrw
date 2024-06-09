@@ -75,6 +75,7 @@ jobs:
           output-file: ${{github.event.inputs.myname}}
 
       - name: Make artefact executable & Compress
+        shell: bash
         run: |
           if [ "$RUNNER_OS" == "macOS" ]; then
            chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
