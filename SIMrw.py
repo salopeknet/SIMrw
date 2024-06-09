@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.2"
+version = "0.2.3"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -216,6 +216,10 @@ def get_records_from_csv(file_path):
         records = [(int(row[0]), row[1], row[2]) for row in csv_reader]
     return records
 
+def filter_phone(phone):
+    allowed_chars = set('0123456789+*#p')
+    return ''.join([char for char in phone if char in allowed_chars])
+
 def reverse_digits_in_pairs(phone):
     reversed_phone = ''.join([phone[i:i+2][::-1] for i in range(0, len(phone), 2)])
     return reversed_phone
@@ -227,6 +231,7 @@ def new_record(index, name, phone, size):
         return [0xFF] * size
 
     name = name[:size-14]
+    phone = filter_phone(phone)
     print(f"\rWriting record {index}... ", end='', flush=True)
     if args.verbose:
         print(name, phone)
