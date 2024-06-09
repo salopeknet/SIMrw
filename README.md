@@ -29,12 +29,12 @@ options:
 > If you know how, better use the Python script natively. 
 
 > [!NOTE]
-> Some (Windows-) antivirus could warn you, this is false positive.
+> Some (Windows-) antivirus could really freak out but this is false positive!
 If you do not trust you can still use the Python script.
 
 > [!NOTE]
 > On macOS you'll have to make the downloaded file executable and run it with [option]+[Right Click]->Run the first time to confirm.<br>
-> If you prefer Terminal, type in the folder where you have downloaded SIMrw-macOS to:<br>```xattr -r -d com.apple.quarantine ./SIMrw-macOS``` followed by<br>```chmod +x ./SIMrw-macOS```.<br>Furthermore if you want to shorten the name type<br>```mv ./SIMrw-macOS ./SIMrw```<br>I think, it should be similar for Linux.
+> If you prefer Terminal, type in the folder where you have downloaded SIMrw-macOS to:<br>```xattr -r -d com.apple.quarantine ./SIMrw-macOS | chmod +x ./SIMrw-macOS```.<br>Furthermore if you want to shorten the name type<br>```mv ./SIMrw-macOS ./SIMrw```<br>I think, it should be similar for Linux.
 
 
 ### Format of CSV-file:
