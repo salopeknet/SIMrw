@@ -74,7 +74,7 @@ jobs:
         with:
           name: ${{runner.os}} Build
           if-no-files-found: warn
-          path: 'build/SIMrw-${{runner.os}}**'
+          path: 'build/SIMrw.dist/SIMrw-${{runner.os}}**'
             
       - name: Create Release ${{github.event.inputs.mytag}} with Builds from Nuitka
         uses: ncipollo/release-action@v1
