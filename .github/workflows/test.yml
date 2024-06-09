@@ -73,7 +73,6 @@ jobs:
           file-version: ${{github.event.inputs.mytag}}
           onefile: false
           output-file: ${{github.event.inputs.myname}}
-          
       - name: Make artefact executable & Compress
         shell: bash
         run: |
