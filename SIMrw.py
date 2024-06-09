@@ -220,6 +220,7 @@ def filter_phone(phone):
     allowed_chars = set('0123456789+*#p')
     return ''.join([char for char in phone if char in allowed_chars])
 
+    
 def reverse_digits_in_pairs(phone):
     reversed_phone = ''.join([phone[i:i+2][::-1] for i in range(0, len(phone), 2)])
     return reversed_phone
@@ -239,18 +240,20 @@ def new_record(index, name, phone, size):
     if phone.startswith("+"):
         phone = phone[1:]
         phone_prefix = "08 91"
-    elif phone.startswith("*") or phone.startswith("#"):
+    elif phone.startswith("*"):
         phone_prefix = "03 FF"
+    elif phone.startswith("#"):
+        phone_prefix = "04 FF"
     else:
         phone_prefix = "06 81"
 
     if len(phone) % 2 != 0:
         phone += "F"
 
-    phone = reverse_digits_in_pairs(phone)
     phone = phone.replace('*', 'A').replace('#', 'B').replace('p', 'C')
+    phone = reverse_digits_in_pairs(phone)
 
-    record = padd(encode_name(name), size-14) + padd(toBytes(f"{phone_prefix} {phone.replace(' ', '')}"), 14)
+    record = padd(encode_name(name), size-14) + padd(toBytes(f"{phone_prefix}{phone}"), 14)
     return record
 
 
