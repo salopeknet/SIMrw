@@ -86,4 +86,5 @@ jobs:
           allowUpdates: true
           commit: main
           tag: ${{github.event.inputs.mytag}}
-          artifacts: 'build/SIMrw-${{runner.os}}**'
+          artifacts: 'test.tar'
+#          artifacts: 'build/SIMrw-${{runner.os}}**'
