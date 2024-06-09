@@ -73,7 +73,7 @@ jobs:
           file-version: ${{github.event.inputs.mytag}}
           onefile: false
           output-file: ${{github.event.inputs.myname}}
-
+          
       - name: Make artefact executable & Compress
         shell: bash
         run: |
@@ -84,7 +84,6 @@ jobs:
            chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           elif [ "$RUNNER_OS" == "Windows" ]; then
-#           chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && zip -r ${{github.event.inputs.myname}}-${{runner.os}}.tar ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           else
            echo "$RUNNER_OS not supported"
