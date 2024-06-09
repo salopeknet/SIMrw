@@ -89,7 +89,7 @@ jobs:
           name: ${{runner.os}} Build
           if-no-files-found: warn
 #          path: 'build/SIMrw.dist/SIMrw-${{runner.os}}**'
-          path: ${{github.event.inputs.myname}}-${{runner.os}}.tar
+          path: ${{github.event.inputs.myname}}-${{runner.os}}.*
 
       - name: Create Release ${{github.event.inputs.mytag}} with Builds from Nuitka
         uses: ncipollo/release-action@v1
@@ -97,5 +97,5 @@ jobs:
           allowUpdates: true
           commit: main
           tag: ${{github.event.inputs.mytag}}
-          artifacts: '${{github.event.inputs.myname}}-${{runner.os}}.tar'
+          artifacts: ${{github.event.inputs.myname}}-${{runner.os}}.*
 #          artifacts: 'build/SIMrw-${{runner.os}}**'
