@@ -88,10 +88,10 @@ jobs:
           fi  
 
       - name: Make artefact executable & Compress (Windows)
-        shell: pwsh
+        shell: powershell
         run: |
           if ($env:RUNNER_OS -eq "Windows") {
-            Compress-Archive -Path "build\${{github.event.inputs.myname}}.dist\*" -DestinationPath "${env:github.event.inputs.myname}-${env:RUNNER_OS}.zip"
+            Compress-Archive -Path * -DestinationPath ${env:github.event.inputs.myname}-${env:RUNNER_OS}.zip
           } else {
             Write-Host "$env:RUNNER_OS not supported"
           }
