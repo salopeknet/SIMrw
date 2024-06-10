@@ -87,6 +87,14 @@ jobs:
            echo "$RUNNER_OS not supported"
           fi  
 
+      - if: runner.os == 'macOS'
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'tar'
+          command: 'mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}}'
+          filename: '${{github.event.inputs.myname}}-${{runner.os}}.tar'
+          path: '${{github.event.inputs.myname}}'
+
       - if: runner.os == 'Windows'
         uses: thedoctor0/zip-release@master
         with:
