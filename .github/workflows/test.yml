@@ -91,7 +91,8 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: 'SIMrw-Windows.zip'
+          filename: '${{github.event.inputs.myname}}-${{runner.os}}'
+          path: 'build/${{github.event.inputs.myname}}.dist'
 #          directory: 'build/SIMrw.dist/*'
 
       - name: Upload Artifacts
