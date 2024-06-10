@@ -74,19 +74,6 @@ jobs:
           onefile: false
           output-file: ${{github.event.inputs.myname}}
 
-      - name: Make artefact executable & Compress (macOS & Linux)
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-#           chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
-#           mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-           chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
-           mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
-          else
-           echo "$RUNNER_OS not supported"
-          fi  
-
       - if: runner.os == 'macOS'
         uses: thedoctor0/zip-release@0.7.6
         with:
