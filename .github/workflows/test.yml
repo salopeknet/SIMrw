@@ -74,7 +74,7 @@ jobs:
           onefile: false
           output-file: ${{github.event.inputs.myname}}
 
-      - name: Make artefact executable & Compress
+      - name: Make artefact executable & Compress (macOS & Linux)
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "macOS" ]; then
@@ -83,11 +83,19 @@ jobs:
           elif [ "$RUNNER_OS" == "Linux" ]; then
            chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.zip ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           else
            echo "$RUNNER_OS not supported"
           fi  
+
+      - name: Make artefact executable & Compress (Windows)
+        shell: pwsh
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+           Compress-Archive -Path build/* -Destination ${{github.event.inputs.myname}}-${{runner.os}}.zip
+          else
+           echo "$RUNNER_OS not supported"
+          fi  
+
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
