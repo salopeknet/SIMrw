@@ -88,7 +88,7 @@ jobs:
           fi  
 
       - if: runner.os == 'macOS'
-        uses: thedoctor0/zip-release@master
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: "tar"
           command: "mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}}"
