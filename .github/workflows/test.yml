@@ -84,8 +84,7 @@ jobs:
            chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           elif [ "$RUNNER_OS" == "Windows" ]; then
-           apt-get install zip -y
-           mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && zip -r ${{github.event.inputs.myname}}-${{runner.os}}.zip ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
+            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -a -c -f ${{github.event.inputs.myname}}-${{runner.os}}.zip ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           else
            echo "$RUNNER_OS not supported"
           fi  
