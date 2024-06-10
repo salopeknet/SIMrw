@@ -78,8 +78,8 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "macOS" ]; then
-           chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
-           mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
+#           chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
+#           mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
           elif [ "$RUNNER_OS" == "Linux" ]; then
            chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}}
            mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}} && tar -zcvf ${{github.event.inputs.myname}}-${{runner.os}}.tar.gz ${{github.event.inputs.myname}} && mv ${{github.event.inputs.myname}} build/${{github.event.inputs.myname}}.dist
@@ -91,16 +91,17 @@ jobs:
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "tar"
-          command: "mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}}"
+          command: "chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}} && mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}}"
           filename: "${{github.event.inputs.myname}}-${{runner.os}}.tar"
           path: "${{github.event.inputs.myname}}"
 
       - if: runner.os == 'Windows'
         uses: thedoctor0/zip-release@master
         with:
-          type: 'zip'
-          filename: '${{github.event.inputs.myname}}-${{runner.os}}'
-          path: 'build/${{github.event.inputs.myname}}.dist'
+          type: "zip"
+          command: "mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}}"
+          path: "${{github.event.inputs.myname}}"
+          filename: "${{github.event.inputs.myname}}-${{runner.os}}.zip"
 #          directory: 'build/SIMrw.dist/*'
 
       - name: Upload Artifacts
