@@ -74,7 +74,8 @@ jobs:
           onefile: false
           output-file: ${{github.event.inputs.myname}}
 
-      - if: runner.os == 'macOS'
+      - name: Make executable & compress TAR for macOS
+        if: runner.os == 'macOS'
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "tar"
@@ -82,7 +83,8 @@ jobs:
           path: "${{github.event.inputs.myname}}"
           filename: "${{github.event.inputs.myname}}-${{runner.os}}.tar.gz"
 
-      - if: runner.os == 'Windows'
+      - name: Compress ZIP for Windows
+        if: runner.os == 'Windows'
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "zip"
@@ -90,14 +92,14 @@ jobs:
           path: "${{github.event.inputs.myname}}"
           filename: "${{github.event.inputs.myname}}-${{runner.os}}.zip"
 
-      - if: runner.os == 'Linux'
+      - name: Make executable & compress TAR for Linux
+        if: runner.os == 'Linux'
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "tar"
           command: "chmod +x build/${{github.event.inputs.myname}}.dist/${{github.event.inputs.myname}} && mv build/${{github.event.inputs.myname}}.dist ${{github.event.inputs.myname}}"
           path: "${{github.event.inputs.myname}}"
           filename: "${{github.event.inputs.myname}}-${{runner.os}}.tar.gz"
-
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
