@@ -90,9 +90,9 @@ jobs:
       - if: runner.os == 'Windows'
         uses: thedoctor0/zip-release@master
         with:
-          type: "zip"
-          filename: ${env:github.event.inputs.myname}-${env:RUNNER_OS}.zip
-          directory: build/${{github.event.inputs.myname}}.dist/*
+          type: 'zip'
+          filename: '${env:github.event.inputs.myname}-${env:RUNNER_OS}.zip'
+          directory: 'build/${{github.event.inputs.myname}}.dist/*'
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
