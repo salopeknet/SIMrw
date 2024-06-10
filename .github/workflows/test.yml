@@ -1,6 +1,6 @@
 # Cross-compile workflow that is manually triggered
 
-name: Python-Cross-Compiler
+name: Python-Cross-Compiler BETA
 
 on:
   workflow_dispatch:
