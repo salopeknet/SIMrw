@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.3"
+version = "0.2.5"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -166,11 +166,6 @@ def decode_record(record):
 
     phone = phone.replace('A', '*').replace('B', '#').replace('C', 'p')
 
-    if args.verbose:
-        if not name:
-            print("--EMPTY--")
-        else:
-            print(name, phone)
 
     return name, phone
 
@@ -201,8 +196,24 @@ def usim_read(reader_nb, csv_filename, pin):
  # Print out the raw record data before decoding
  #           print(f"\rRaw record {record_idx}: {data}")
 
-            name, phone = decode_record(data)
-            writer.writerow([record_idx, name, phone])
+            if args.readdump:
+                hex_data = ' '.join('%02X' % byte for byte in data)
+                if args.verbose:
+                    print(hex_data)
+
+                writer.writerow([record_idx, hex_data])
+
+            else:
+                name, phone = decode_record(data)
+
+                if args.verbose:
+                    if not name:
+                        print("--EMPTY--")
+                    else:
+                        print(name, phone)
+
+                writer.writerow([record_idx, name, phone])
+            
             read_records += 1
 
     print(f"READY!\nSuccessfully read {read_records} records and written to {csv_filename}.\n")
@@ -282,6 +293,7 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
     group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
+    group.add_argument('-rd', '--readdump', action='store_true', help='Read Dump: Write direct APDU responses as HEX-Bytes to CSV')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show names & numbers during reading/writing')
     parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted)', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
@@ -289,7 +301,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.read:
+    if args.read or args.readdump:
         usim_read(args.reader_nb, args.csv_file, args.pin)
     elif args.write:
         if not os.path.isfile(args.csv_file):
@@ -298,3 +310,4 @@ if __name__ == "__main__":
         records = get_records_from_csv(args.csv_file)
         written_records = usim_write(args.reader_nb, records, args.pin)
         print(f"READY!\nSuccessfully written {written_records} records to SIM card.\n")
+        
