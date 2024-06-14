@@ -6,10 +6,17 @@ Command line only. More to come. Perhaps. :)
 
 ### Usage (more description to come):
 ```
-*** SIMrw vX.X.X by Micha Salopek (based on the work of Ludovic Rousseau) ***
+      ____ ___ __  __               
+     / ___|_ _|  \/  |_ ____      __
+     \___ \| || |\/| | '__\ \ /\ / /
+      ___) | || |  | | |   \ V  V / 
+     |____/___|_|  |_|_|    \_/\_/  
+                                
+***** SIMrw vX.X.X by Micha Salopek *****
+ (based on the work of Ludovic Rousseau)
 see: https://github.com/salopeknet/SIMrw
 
-usage: SIMrw.py [-h] (-r | -w) [-v] [-p PIN] csv_file [reader_nb]
+usage: SIMrwDUMP.py [-h] (-r | -w | -rd | -wd) [-v] [-p PIN] csv_file [reader_nb]
 
 Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.
 
@@ -22,6 +29,7 @@ options:
   -r, --read         Read phonebook from the USIM card and save as CSV
   -w, --write        Write CSV phonebook to the USIM card
   -rd, --readdump    Read Dump: Write direct APDU responses as HEX-Bytes to CSV
+  -wd, --writedump   Write Dump: Write HEX-Bytes from CSV to SIM-Card
   -v, --verbose      Show names & numbers during reading/writing
   -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted)
 ```
@@ -34,8 +42,14 @@ options:
 If you do not trust you can still use the Python script.
 
 > [!NOTE]
-> On macOS you'll have to make the downloaded file executable and run it with [option]+[Right Click]->Run the first time to confirm.<br>
-> If you prefer Terminal, type in the folder where you have downloaded SIMrw-macOS to:<br>```xattr -r -d com.apple.quarantine ./SIMrw-macOS | chmod +x ./SIMrw-macOS```.<br>Furthermore if you want to shorten the name type<br>```mv ./SIMrw-macOS ./SIMrw```<br>I think, it should be similar for Linux.
+> On macOS you'll have run it with ```[option]+[Right Click] -> Open``` the first time to confirm the security warning.<br>
+> If you prefer Terminal, type in the folder where you have downloaded SIMrw to:<br>```xattr -r -d com.apple.quarantine ./SIMrw```<br>
+
+> [!NOTE]
+> For each Platform there are two versions to download:<br>
+> *-ONEFILE: This is one single executable file, which gets self-extracted at each program start to some temp-directory.<br>This is the first choice and should work for most of you guys!<br>
+> *-STANDALONE: This is a single directory distribution with all needed files/librarys which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract ever time at startup like ONEFILE-version.<br>
+> If you get some weird error message from macOS-security copmplaining about 'Python', try ```xattr -r -d com.apple.quarantine ./Python``` in program folder.
 
 
 ### Format of CSV-file:
