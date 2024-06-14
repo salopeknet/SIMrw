@@ -16,7 +16,7 @@ Command line only. More to come. Perhaps. :)
  (based on the work of Ludovic Rousseau)
 see: https://github.com/salopeknet/SIMrw
 
-usage: SIMrwDUMP.py [-h] (-r | -w | -rd | -wd) [-v] [-p PIN] csv_file [reader_nb]
+usage: SIMrw.py [-h] (-r | -w | -rd | -wd) [-v] [-p PIN] csv_file [reader_nb]
 
 Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.
 
