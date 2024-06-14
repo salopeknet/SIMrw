@@ -21,6 +21,7 @@ options:
   -h, --help         show this help message and exit
   -r, --read         Read phonebook from the USIM card and save as CSV
   -w, --write        Write CSV phonebook to the USIM card
+  -rd, --readdump    Read Dump: Write direct APDU responses as HEX-Bytes to CSV
   -v, --verbose      Show names & numbers during reading/writing
   -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted)
 ```
