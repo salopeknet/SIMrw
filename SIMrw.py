@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.5"
+version = "0.2.6"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -22,7 +22,14 @@ ascii_logo = """
      |____/___|_|  |_|_|    \_/\_/  
                                 
 """
-message_Start = f"\n{ascii_logo}***** SIMrw v{version} by Micha Salopek *****\n(based on the work of Ludovic Rousseau)\nsee: https://github.com/salopeknet/SIMrw\n"
+message_Start = f"""
+
+{ascii_logo}
+***** SIMrw v{version} by Micha Salopek *****
+ (based on the work of Ludovic Rousseau)
+see: https://github.com/salopeknet/SIMrw
+
+"""
 message_End = f"\n\nProgram exits.\n\nHave a nice day!\n"
 
 
@@ -88,43 +95,40 @@ def usim(reader_nb, pin=None):
 
     size = data[-1]
 
-#    if pin is not None:
-    try:
-        # Convert PIN to string of ASCII values
-        pin_str = str(pin)
-        pin_ascii = [ord(c) for c in pin_str]
-        # Pad PIN to 8 bytes if it's less than 8 bytes
-        pin_padded = padd(pin_ascii, 8)
-        # Verify CHV
-        PIN_VERIFY = "A0 20 00 01 08"
-        cmd = toBytes(PIN_VERIFY) + pin_padded
-        data, sw1, sw2 = connection.transmit(cmd)
-    
-        if (sw1, sw2) == (0x90, 0x00):
-            pass
-        elif (sw1, sw2) == (0x98, 0x08):
-            if pin is not None:
-                print("\n NOTE: PIN was provided, but deactivated on SIM-Card. Continuing.\n\n")
-                pass
-            pass
-        elif (sw1, sw2) == (0x98, 0x40):
-            print("\n ERROR: PIN1 is LOCKED! Please unlock first.\n")
-            sys.exit(1)
-        elif (sw1, sw2) == (0x98, 0x04):
-            print("\n ATTENTION: Wrong or missing PIN!!!")
-            PIN_CHECK_REMAINING = "00 20 00 01 00"
-            cmd = toBytes(PIN_CHECK_REMAINING)
+    if pin is not None:
+        try:
+            # Convert PIN to string of ASCII values
+            pin_str = str(pin)
+            pin_ascii = [ord(c) for c in pin_str]
+            # Pad PIN to 8 bytes if it's less than 8 bytes
+            pin_padded = padd(pin_ascii, 8)
+            # Verify CHV
+            PIN_VERIFY = "A0 20 00 01 08"
+            cmd = toBytes(PIN_VERIFY) + pin_padded
             data, sw1, sw2 = connection.transmit(cmd)
-            if sw2 == 0xC0:
-                print("\n ERROR: PIN1 is LOCKED. Please unlock first.\n")
+        
+            if (sw1, sw2) == (0x90, 0x00):
+                pass
+            elif (sw1, sw2) == (0x98, 0x08):
+                print("\n NOTE: PIN was provided, but deactivated on SIM-Card. Continuing.\n\n")
+            elif (sw1, sw2) == (0x98, 0x40):
+                print("\n ERROR: PIN1 is LOCKED! Please unlock first.\n")
+                sys.exit(1)
+            elif (sw1, sw2) == (0x98, 0x04):
+                print("\n ATTENTION: Wrong or missing PIN!!!")
+                PIN_CHECK_REMAINING = "00 20 00 01 00"
+                cmd = toBytes(PIN_CHECK_REMAINING)
+                data, sw1, sw2 = connection.transmit(cmd)
+                if sw2 == 0xC0:
+                    print("\n ERROR: PIN1 is LOCKED. Please unlock first.\n")
+                else:
+                    print(f"\n -> {sw2 & 0x0F} attempt(s) left!\n\n")
+                sys.exit(1)
             else:
-                print(f"\n -> {sw2 & 0x0F} attempt(s) left!\n\n")
+                raise Exception(f"Unexpected response: sw1={sw1}, sw2={sw2}")
+        except Exception as e:
+            print(f"ERROR: {e}")
             sys.exit(1)
-        else:
-            raise Exception(f"Unexpected response: sw1={sw1}, sw2={sw2}")
-    except Exception as e:
-        print(f"ERROR: {e}")
-        sys.exit(1)
 
     return size, connection
 
@@ -138,7 +142,7 @@ def decode_name(name_enc):
         decoded_name += next((char for char, value in char_dict.items() if value == byte), chr(byte))
     return decoded_name
 
-#Reading
+# Reading
 
 def decode_record(record):
     X = len(record) - 14
@@ -166,10 +170,9 @@ def decode_record(record):
 
     phone = phone.replace('A', '*').replace('B', '#').replace('C', 'p')
 
-
     return name, phone
 
-def usim_read(reader_nb, csv_filename, pin):
+def usim_read(reader_nb, csv_filename, pin, args):
     if os.path.isfile(csv_filename):
         overwrite = input(f"The CSV file '{csv_filename}' already exists. Do you want to overwrite it? (y/n): ").strip().lower()
         if overwrite != 'y':
@@ -184,17 +187,14 @@ def usim_read(reader_nb, csv_filename, pin):
         read_records = 0
 
         for nbr in range(1, 250):
-            header = [0xA0, 0xB2]
+            read_record = [0xA0, 0xB2]
             record_idx = nbr
-            cmd = header + [record_idx, 0x04, size]
+            cmd = read_record + [record_idx, 0x04, size]
             data, sw1, sw2 = connection.transmit(cmd)
             if (sw1, sw2) != (0x90, 0x00):
                 break
 
             print(f"\rReading record {record_idx}... ", end='', flush=True)
-
- # Print out the raw record data before decoding
- #           print(f"\rRaw record {record_idx}: {data}")
 
             if args.readdump:
                 hex_data = ' '.join('%02X' % byte for byte in data)
@@ -202,7 +202,6 @@ def usim_read(reader_nb, csv_filename, pin):
                     print(hex_data)
 
                 writer.writerow([record_idx, hex_data])
-
             else:
                 name, phone = decode_record(data)
 
@@ -218,25 +217,26 @@ def usim_read(reader_nb, csv_filename, pin):
 
     print(f"READY!\nSuccessfully read {read_records} records and written to {csv_filename}.\n")
 
+# Writing
 
-#Writing
-
-def get_records_from_csv(file_path):
+def get_records_from_csv(file_path, args):
     with open(file_path, mode='r') as file:
         csv_reader = csv.reader(file, delimiter=';')
-        records = [(int(row[0]), row[1], row[2]) for row in csv_reader]
+        if args.writedump:
+            records = [(int(row[0]), row[1]) for row in csv_reader]
+        else:
+            records = [(int(row[0]), row[1], row[2]) for row in csv_reader]
     return records
 
 def filter_phone(phone):
     allowed_chars = set('0123456789+*#p')
     return ''.join([char for char in phone if char in allowed_chars])
 
-    
 def reverse_digits_in_pairs(phone):
     reversed_phone = ''.join([phone[i:i+2][::-1] for i in range(0, len(phone), 2)])
     return reversed_phone
 
-def new_record(index, name, phone, size):
+def new_record(index, name, phone, size, args):
     if not name:
         if args.verbose:
             print(f"Writing record {index}... --EMPTY--")
@@ -244,7 +244,7 @@ def new_record(index, name, phone, size):
 
     name = name[:size-14]
     phone = filter_phone(phone)
-    print(f"\rWriting record {index}... ", end='', flush=True)
+
     if args.verbose:
         print(name, phone)
 
@@ -267,26 +267,46 @@ def new_record(index, name, phone, size):
     record = padd(encode_name(name), size-14) + padd(toBytes(f"{phone_prefix}{phone}"), 14)
     return record
 
-
-def usim_write(reader_nb, records, pin):
+def usim_write(reader_nb, records, pin, args):
     written_records = 0
     (size, connection) = usim(reader_nb, pin)
 
-    for record_idx, name, phone in records:
-        record = new_record(record_idx, name, phone, size)
-        header = [0xA0, 0xDC]
-        cmd = header + [record_idx, 0x04, size] + record
-        data, sw1, sw2 = connection.transmit(cmd)
+    if args.writedump:
+        for record_idx, hex_bytes in records:
+            print(f"\rWriting record {record_idx}... ", end='', flush=True)
 
-        if (sw1, sw2) != (0x90, 0x00):
-            print(f"Error writing record {record_idx}")
-        else:
-            written_records += 1
+            if args.verbose:
+                print(hex_bytes)
+
+            record = toBytes(hex_bytes)
+            write_record = [0xA0, 0xDC]
+            cmd = write_record + [record_idx, 0x04, size] + record
+            data, sw1, sw2 = connection.transmit(cmd)
+            #print(cmd)
+
+            if (sw1, sw2) != (0x90, 0x00):
+                print(f"Error writing record {record_idx}")
+            else:
+                written_records += 1
+
+    if args.write:   
+        for record_idx, name, phone in records:
+
+            print(f"\rWriting record {record_idx}... ", end='', flush=True)
+
+            record = new_record(record_idx, name, phone, size, args)
+            write_record = [0xA0, 0xDC]
+            cmd = write_record + [record_idx, 0x04, size] + record
+            data, sw1, sw2 = connection.transmit(cmd)
+
+            if (sw1, sw2) != (0x90, 0x00):
+                print(f"Error writing record {record_idx}")
+            else:
+                written_records += 1
 
     return written_records
 
 if __name__ == "__main__":
-
     print(message_Start)
 
     parser = argparse.ArgumentParser(description='Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.')
@@ -294,6 +314,7 @@ if __name__ == "__main__":
     group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
     group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
     group.add_argument('-rd', '--readdump', action='store_true', help='Read Dump: Write direct APDU responses as HEX-Bytes to CSV')
+    group.add_argument('-wd', '--writedump', action='store_true', help='Write Dump: Write HEX-Bytes from CSV to SIM-Card')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show names & numbers during reading/writing')
     parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted)', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
@@ -302,12 +323,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.read or args.readdump:
-        usim_read(args.reader_nb, args.csv_file, args.pin)
-    elif args.write:
+        usim_read(args.reader_nb, args.csv_file, args.pin, args)
+    elif args.writedump or args.write:
         if not os.path.isfile(args.csv_file):
             print(f"\nERROR: The CSV file '{args.csv_file}' doesn't exist. Please check filename/path.\nAborting operation.\n")
             sys.exit(1)
-        records = get_records_from_csv(args.csv_file)
-        written_records = usim_write(args.reader_nb, records, args.pin)
+        records = get_records_from_csv(args.csv_file, args)
+        if args.writedump:
+            written_records = usim_write(args.reader_nb, [(idx, data) for idx, data in records], args.pin, args)
+        else:
+            written_records = usim_write(args.reader_nb, [(idx, name, phone) for idx, name, phone in records], args.pin, args)
         print(f"READY!\nSuccessfully written {written_records} records to SIM card.\n")
-        
