@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.6"
+version = "0.2.7"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -313,12 +313,18 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
     group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
-    group.add_argument('-rd', '--readdump', action='store_true', help='Read Dump: Write direct APDU responses as HEX-Bytes to CSV')
-    group.add_argument('-wd', '--writedump', action='store_true', help='Write Dump: Write HEX-Bytes from CSV to SIM-Card')
+    group.add_argument('-rd', '--readdump', action='store_true', help='Write direct APDU responses (dump) as HEX-Bytes to CSV (bytewise backup)')
+    group.add_argument('-wd', '--writedump', action='store_true', help='Write Dump: Write HEX-Bytes from (dumped) CSV to USIM card')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show names & numbers during reading/writing')
     parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted)', default=None)
     parser.add_argument('csv_file', help='CSV file name for reading or writing')
     parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0 if omitted)')
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        print(f"\n\n!!! This is a command-line only tool !!!\n\nYou have to pass some arguments (see above)... :)\n\nFor example type 'SIMrw -r phonebook.csv' to read a phonebook from SIM-card to save a csv-file.\n\nPress [ENTER] to exit and try again.")
+        input()
+        sys.exit(0)
 
     args = parser.parse_args()
 
