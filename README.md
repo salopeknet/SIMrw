@@ -32,24 +32,28 @@ options:
   -v, --verbose      Show names & numbers during reading/writing
   -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted)
 ```
+
+### Download & first run:
+Download latest release [here](https://github.com/salopeknet/SIMrw/releases/latest)<br>
+
+For each Platform there are two versions to download. Just download and unpack (if it doesn't happen automatically on your system):<br>
+
+*-ONEFILE: This is one single executable file, which gets self-extracted at each program start to some temp-directory.<br>This is the first choice and should work for most of you guys!<br>
+
+*-STANDALONE: This is a single directory distribution with all needed files/librarys which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract ever time at startup like ONEFILE-version.<br>
+
 > [!NOTE]
-> The downloadable executables are tested on Windows 10 and macOS Sonoma.
-> If you know how, better use the Python script natively. 
+> On macOS you'll have run it with ```[option]+[Right Click] -> Open``` the first time to confirm the security warning.<br>
+> If you prefer Terminal, type in the folder where you have downloaded SIMrw to:<br>```xattr -r -d com.apple.quarantine ./SIMrw```<br>
+> If you get some weird error message from macOS-security copmplaining about 'Python', try ```xattr -r -d com.apple.quarantine ./Python``` in program folder.
 
 > [!NOTE]
 > Some (Windows-) antivirus could really freak out but this is false positive!
 If you do not trust you can still use the Python script.
 
 > [!NOTE]
-> On macOS you'll have run it with ```[option]+[Right Click] -> Open``` the first time to confirm the security warning.<br>
-> If you prefer Terminal, type in the folder where you have downloaded SIMrw to:<br>```xattr -r -d com.apple.quarantine ./SIMrw```<br>
-
-> [!NOTE]
-> For each Platform there are two versions to download:<br>
-> *-ONEFILE: This is one single executable file, which gets self-extracted at each program start to some temp-directory.<br>This is the first choice and should work for most of you guys!<br>
-> *-STANDALONE: This is a single directory distribution with all needed files/librarys which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract ever time at startup like ONEFILE-version.<br>
-> If you get some weird error message from macOS-security copmplaining about 'Python', try ```xattr -r -d com.apple.quarantine ./Python``` in program folder.
-
+> The downloadable executables are tested on Windows 10 and macOS Sonoma.
+> If you know how, better use the Python script natively. 
 
 ### Format of CSV-file:
 Either read out a SIM phonebook first and then edit the created CSV-file.
