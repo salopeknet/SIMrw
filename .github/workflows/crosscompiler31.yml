@@ -84,7 +84,7 @@ jobs:
 #Finalizing
           
       - name: STANDALONE make executable & compress TAR for macOS or Linux
-        if: ${{matrix.onefile == false && (runner.os == 'macOS' || runner.os ==  'Linux')}}
+        if: ${{matrix.onefile == 'false' && (runner.os == 'macOS' || runner.os ==  'Linux')}}
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "tar"
@@ -93,7 +93,7 @@ jobs:
           filename: "${{github.event.inputs.myname}}-${{runner.os}}-STANDALONE.tar.gz"          
 
       - name: STANDALONE compress ZIP for Windows
-        if: ${{matrix.onefile == false && runner.os == 'Windows'}}
+        if: ${{matrix.onefile == 'false' && runner.os == 'Windows'}}
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "zip"
@@ -102,7 +102,7 @@ jobs:
           filename: "${{github.event.inputs.myname}}-${{runner.os}}-STANDALONE.zip"
 
       - name: ONEFILE make executable & compress TAR for macOS or Linux
-        if: ${{matrix.onefile == true && (runner.os == 'macOS' || runner.os ==  'Linux')}}
+        if: ${{matrix.onefile == 'true' && (runner.os == 'macOS' || runner.os ==  'Linux')}}
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "tar"
@@ -111,7 +111,7 @@ jobs:
           filename: "${{github.event.inputs.myname}}-${{runner.os}}-ONEFILE.tar.gz"          
 
       - name: ONEFILE compress ZIP for Windows
-        if: ${{matrix.onefile == true && runner.os == 'Windows'}}
+        if: ${{matrix.onefile == 'true' && runner.os == 'Windows'}}
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "zip"
