@@ -68,5 +68,5 @@ First field/column is the 'index number', second the 'name', third the 'phone nu
 Max. chars in name is 18 (I think). No header line. Delimiter is ';'. If you have empty records/lines in your CSV, always keep at least the 'index number' (followed by ';;') as a placeholder.
 
 
-###Thanks go out to:
+### Thanks go out to:
 Ludovic Rousseau for his project [pyScard](https://github.com/LudovicRousseau/pyscard), on which this tool is based at. Merci beaucoup!
