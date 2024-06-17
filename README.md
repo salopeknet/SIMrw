@@ -40,12 +40,12 @@ For each Platform there are two versions to download. Just download and unpack (
 
 *-ONEFILE: This is one single executable file, which gets self-extracted at each program start to some temp-directory.<br>This is the first choice and should work for most of you guys!<br>
 
-*-ONEDIR: This is a single directory distribution with all needed files/librarys which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract every time at startup like ONEFILE-version.<br>
+*-ONEDIR: This is a single directory distribution with all needed files/libraries which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract every time at startup like ONEFILE-version.<br>
 
 > [!NOTE]
 > On macOS you'll have run it with ```[option]+[Right Click] -> Open``` the first time to confirm the security warning.<br>
 > If you prefer Terminal, type in the folder where you have downloaded SIMrw to:<br>```xattr -r -d com.apple.quarantine ./SIMrw```<br>
-> If you get some weird error message from macOS-security copmplaining about 'Python', try ```xattr -r -d com.apple.quarantine ./Python``` in program folder.
+> If you get some weird error message from macOS-security complaining about 'Python', try ```xattr -r -d com.apple.quarantine ./Python``` in program folder.
 
 > [!NOTE]
 > Some (Windows-) antivirus could really freak out but this is false positive!
