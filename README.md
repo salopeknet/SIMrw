@@ -40,7 +40,7 @@ For each Platform there are two versions to download. Just download and unpack (
 
 *-ONEFILE: This is one single executable file, which gets self-extracted at each program start to some temp-directory.<br>This is the first choice and should work for most of you guys!<br>
 
-*-ONEDIR: This is a single directory distribution with all needed files/librarys which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract ever time at startup like ONEFILE-version.<br>
+*-ONEDIR: This is a single directory distribution with all needed files/librarys which you unpack manually. Then you can start SIMrw directly from there.<br> This version could be slightly quicker, as it doesn't self-extract every time at startup like ONEFILE-version.<br>
 
 > [!NOTE]
 > On macOS you'll have run it with ```[option]+[Right Click] -> Open``` the first time to confirm the security warning.<br>
