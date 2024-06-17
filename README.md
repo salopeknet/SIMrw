@@ -13,7 +13,6 @@ Command line only. More to come. Perhaps. :)
      |____/___|_|  |_|_|    \_/\_/  
                                 
 ***** SIMrw vX.X.X by Micha Salopek *****
- (based on the work of Ludovic Rousseau)
 see: https://github.com/salopeknet/SIMrw
 
 usage: SIMrw.py [-h] (-r | -w | -rd | -wd) [-v] [-p PIN] csv_file [reader_nb]
@@ -67,3 +66,7 @@ Or start a new one like in this example:
 ```
 First field/column is the 'index number', second the 'name', third the 'phone number'. 
 Max. chars in name is 18 (I think). No header line. Delimiter is ';'. If you have empty records/lines in your CSV, always keep at least the 'index number' (followed by ';;') as a placeholder.
+
+
+###Thanks go out to:
+Ludovic Rousseau for his project [pyScard](https://github.com/LudovicRousseau/pyscard), on which this tool is based at. Merci beaucoup!
