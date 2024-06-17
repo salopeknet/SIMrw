@@ -73,4 +73,4 @@ Max. chars in name is 18 (I think). No header line. Delimiter is ';'. If you hav
 
 
 ### Thanks go out to:
-Ludovic Rousseau for his project [pyScard](https://github.com/LudovicRousseau/pyscard), on which this tool is based at. Merci beaucoup!
+Ludovic Rousseau for his project [pyscard](https://github.com/LudovicRousseau/pyscard), on which this tool is based at. Merci beaucoup!
