@@ -10,7 +10,7 @@ on:
       scriptname:
 
 # input default script name (without .py) here:
-        default: helloworld
+        default: SIMrw
         
         description: 'Script name'
         type: string
@@ -100,11 +100,13 @@ jobs:
       - name: Ubuntu specific
         if: matrix.os == 'ubuntu-latest'
         run: |
+          sudo apt install libpcsclite-dev python3-all-dev python3-setuptools swig
 
       - name: MacOS specific
         if: matrix.os == 'macos-latest'
         run: |
-         
+          brew install swig
+
       - name: Windows specific
         if: matrix.os == 'windows-latest'
         run: |
