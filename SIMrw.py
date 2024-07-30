@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoCardException, NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.8"
+version = "0.2.9"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -167,8 +167,8 @@ def decode_record(record):
     name_bytes = record[0:X - 1]
     name = decode_name(name_bytes).strip("ÿ")
 
-    tel_size = record[X]
-    phone = record[X + 2:X + tel_size + 1]
+    tel_size = record[X+1]
+    phone = record[X + 2:X + tel_size]
 
     decoded = ""
     for n in phone:
@@ -182,11 +182,19 @@ def decode_record(record):
 
     phone = decoded.strip("F")
 
-    if record[X + 1] == 0x91:
-        phone = "+" + phone
-
     phone = phone.replace('A', '*').replace('B', '#').replace('C', 'p')
 
+    if record[X + 1] == 0x91:
+        # Add '+' as a prefix if international phone number
+        if phone and phone[0].isdigit():
+            phone = "+" + phone
+        # Check if USSD-Code for call divert with international number
+        if (phone.startswith("**") and phone[2:3].isdigit() and phone[4] == '*'):
+            phone = phone[:5] + "+" + phone[5:]
+        # Check if 2-digit-USSD-Code with international number
+        elif (phone[0] in "*#" and phone[1:2].isdigit() and phone[3] in "*#"):
+            phone = phone[:4] + "+" + phone[4:]
+ 
     return name, phone
 
 def usim_read(reader_nb, csv_filename, pin, args):
@@ -274,11 +282,11 @@ def new_record(index, name, phone, size, args):
     if args.verbose:
         print(name, phone)
 
-    if phone.startswith("+"):
-        phone = phone[1:]
+    if "+" in phone:
+        phone = phone.replace('+', '')
         phone_prefix = "91"
-    elif phone.startswith("*") or phone.startswith("#"):
-        phone_prefix = "FF"
+#    elif phone.startswith("*") or phone.startswith("#"):
+#        phone_prefix = "FF"
     else:
         phone_prefix = "81"
 
@@ -288,7 +296,7 @@ def new_record(index, name, phone, size, args):
     phone = phone.replace('*', 'A').replace('#', 'B').replace('p', 'C')
     phone = reverse_digits_in_pairs(phone)
 
-    phone_length = len(phone) // 2
+    phone_length = (len(phone) // 2) + 1
     phone_data = padd(toBytes(f"{phone_length:02X}{phone_prefix}{phone}"), 14)
 
     record = padd(encode_name(name), size-14) + phone_data
