@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoCardException, NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.8"
+version = "0.2.9"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
