@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoCardException, NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.9"
+version = "0.2.8"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -282,11 +282,14 @@ def new_record(index, name, phone, size, args):
     if args.verbose:
         print(name, phone)
 
+    #check for international number
     if "+" in phone:
         phone = phone.replace('+', '')
         phone_prefix = "91"
-#    elif phone.startswith("*") or phone.startswith("#"):
-#        phone_prefix = "FF"
+    #check for plain USSD-code
+    elif (phone.startswith(('*', '**', '#', '##', '*#')) and phone.endswith(('*', '#')) and phone.strip('*#').isdigit()):
+        phone_prefix = "FF"
+    #else national number
     else:
         phone_prefix = "81"
 
