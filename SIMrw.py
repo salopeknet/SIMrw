@@ -11,7 +11,7 @@ from smartcard.CardConnectionObserver import ConsoleCardConnectionObserver
 from smartcard.Exceptions import NoCardException, NoReadersException, CardConnectionException
 
 # Version information
-version = "0.2.9"
+version = "0.3.0"
 
 # from https://patorjk.com/software/taag/#p=display&f=Ivrit&t=SIMrw
 ascii_logo = """
@@ -33,14 +33,9 @@ message_End = f"\n\nProgram exits.\n\nHave a nice day!\n"
 
 # USIM setup
 
-debug = False
+debug = True
 
-import sys
-from smartcard.Exceptions import NoCardException, NoReadersException, CardConnectionException
-from smartcard.System import readers
-from smartcard.util import toBytes
-
-def usim(reader_nb, pin=None):
+def usim(reader_nb, pin=None, setpin=''):
     try:
         # Get all the available readers
         r = readers()
@@ -58,7 +53,7 @@ def usim(reader_nb, pin=None):
         print("Please select a valid reader.\n")
         sys.exit(1)
 
-    print("Using:", reader, "\n")
+    print(f"\nUsing:", reader, "\n")
 
     connection = None
     try:
@@ -122,30 +117,124 @@ def usim(reader_nb, pin=None):
             PIN_VERIFY = "A0 20 00 01 08"
             cmd = toBytes(PIN_VERIFY) + pin_padded
             data, sw1, sw2 = connection.transmit(cmd)
-
+                                
             if (sw1, sw2) == (0x90, 0x00):
+                print("\nPIN accepted.\n")
                 pass
             elif (sw1, sw2) == (0x98, 0x08):
-                print("\nNOTE: PIN was provided, but deactivated on SIM-Card. Continuing.\n")
+                print("\nNOTE: PIN was provided, but disabled on SIM-Card. Continuing.\n")
             elif (sw1, sw2) == (0x98, 0x40):
                 print("\nERROR: PIN1 is LOCKED! Please unlock first.\n")
                 sys.exit(1)
             elif (sw1, sw2) == (0x98, 0x04):
                 print("\nATTENTION: Wrong or missing PIN!!!")
-                PIN_CHECK_REMAINING = "00 20 00 01 00"
+                PIN_CHECK_REMAINING = "00 20 00 01"
                 cmd = toBytes(PIN_CHECK_REMAINING)
                 data, sw1, sw2 = connection.transmit(cmd)
-                if sw2 == 0xC0:
-                    print("\nERROR: PIN1 is LOCKED. Please unlock first.\n")
+                if (sw1, sw2) == (0x63, 0xC0):
+                    raise Exception("\nERROR: PIN1 is LOCKED. Please unlock first.\n")
+                elif sw1 == 0x63:
+                    raise Exception(f"\n-> {sw2 & 0x0F} attempt(s) left!\n")
                 else:
-                    print(f"\n-> {sw2 & 0x0F} attempt(s) left!\n")
-                sys.exit(1)
-            else:
-                raise Exception(f"Unexpected response: sw1={sw1}, sw2={sw2}")
+                    raise Exception(f"Unexpected response: sw1={sw1:02X}, sw2={sw2:02X}")
+                    sys.exit(1)
+
+
+            if args.setpin.lower() == 'off':
+                print(f"\rDisabling PIN... ", end='', flush=True)
+                DISABLE_PIN = "A0 26 00 01 08"  # Command for disabling PIN
+                cmd = toBytes(DISABLE_PIN) + pin_padded
+                data, sw1, sw2 = connection.transmit(cmd)
+                if (sw1, sw2) == (0x90, 0x00):
+                    print(f"PIN disabled now!\n")
+                elif (sw1, sw2) == (0x98, 0x08):
+                    print(f"PIN was disabled already!\n")
+                elif (sw1, sw2) == (0x98, 0x04):
+                    print("\nATTENTION: Wrong or missing PIN!!!")
+                    PIN_CHECK_REMAINING = "00 20 00 01"
+                    cmd = toBytes(PIN_CHECK_REMAINING)
+                    data, sw1, sw2 = connection.transmit(cmd)
+                    if (sw1, sw2) == (0x63, 0xC0):
+                        raise Exception("\nERROR: PIN1 is LOCKED. Please unlock first.\n")
+                        sys.exit(1)
+                    elif sw1 == 0x63:
+                        raise Exception(f"\n-> {sw2 & 0x0F} attempt(s) left!\n")
+                        sys.exit(1)
+                else:
+                    raise Exception(f"Unexpected response: sw1={sw1:02X}, sw2={sw2:02X}")
+                    sys.exit(1)
+
+
+            elif args.setpin.lower() == 'on':
+                print(f"\rEnabling PIN... ", end='', flush=True)
+                ENABLE_PIN = "A0 28 00 01 08"  # Command for enabling PIN
+                cmd = toBytes(ENABLE_PIN) + pin_padded
+                data, sw1, sw2 = connection.transmit(cmd)
+                if (sw1, sw2) == (0x90, 0x00):
+                    print(f"PIN {pin_str} is enabled now!\n")
+                elif (sw1, sw2) == (0x98, 0x08):
+                    print(f"PIN was enabled already!\n")
+                elif (sw1, sw2) == (0x98, 0x04):
+                    print("\nATTENTION: Wrong or missing PIN!!!")
+                    PIN_CHECK_REMAINING = "00 20 00 01"
+                    cmd = toBytes(PIN_CHECK_REMAINING)
+                    data, sw1, sw2 = connection.transmit(cmd)
+                    if (sw1, sw2) == (0x63, 0xC0):
+                        raise Exception("\nERROR: PIN1 is LOCKED. Please unlock first.\n")
+                        sys.exit(1)
+                    elif sw1 == 0x63:
+                        raise Exception(f"\n-> {sw2 & 0x0F} attempt(s) left!\n")
+                        sys.exit(1)
+                else:
+                    raise Exception(f"Unexpected response: sw1={sw1:02X}, sw2={sw2:02X}")
+                    sys.exit(1)
+
+
+            elif args.setpin and args.setpin.isdigit() and 4 <= len(args.setpin) <= 8:
+                print(f"\rChanging PIN... ", end='', flush=True)
+            
+                npin_str = args.setpin
+                npin_ascii = [ord(c) for c in npin_str]
+                npin_padded = padd(npin_ascii, 8)
+            
+                CHANGE_PIN = "A0 24 00 01 10"  # Command for changing PIN1
+                cmd = toBytes(CHANGE_PIN) + pin_padded + npin_padded
+                data, sw1, sw2 = connection.transmit(cmd)
+                if (sw1, sw2) == (0x90, 0x00):
+                    print(f"PIN was changed to {npin_str}!\n")
+                    
+                ENABLE_PIN = "A0 28 00 01 08"  # Command for enabling PIN
+                cmd = toBytes(ENABLE_PIN) + npin_padded
+                data, sw1, sw2 = connection.transmit(cmd)
+                if (sw1, sw2) == (0x90, 0x00):
+                    print(f"The new PIN is enabled!\n")
+                elif (sw1, sw2) == (0x98, 0x08):
+                    print(f"The new PIN is also enabled now!\n")
+                elif (sw1, sw2) == (0x98, 0x04):
+                    print("\nATTENTION: Wrong or missing PIN!!!")
+                    PIN_CHECK_REMAINING = "00 20 00 01"
+                    cmd = toBytes(PIN_CHECK_REMAINING)
+                    data, sw1, sw2 = connection.transmit(cmd)
+                    if (sw1, sw2) == (0x63, 0xC0):
+                        print("\nERROR: PIN1 is LOCKED. Please unlock first.\n")
+                        sys.exit(1)
+                    elif sw1 == 0x63:
+                        print(f"\n-> {sw2 & 0x0F} attempt(s) left!\n")
+                        sys.exit(1)
+
+                else:
+                    raise Exception(f"Unexpected response: sw1={sw1:02X}, sw2={sw2:02X}")
+                    sys.exit(1)
+
+            else: 
+                if args.setpin:
+                    print(f"Invalid value for '-sp' / '--setpin'. Possible options are:\n - OFF to disable PIN1\n - ON to enable PIN1\n - The new PIN must be a numeric value between 4 and 8 digits.")
+
 
         except Exception as e:
             print(f"ERROR: {e}")
             sys.exit(1)
+
 
     return size, connection, num_records
 
@@ -197,7 +286,7 @@ def decode_record(record):
  
     return name, phone
 
-def usim_read(reader_nb, csv_filename, pin, args):
+def usim_read(reader_nb, csv_filename, pin, setpin, args):
     if os.path.isfile(csv_filename):
         overwrite = input(f"The CSV file '{csv_filename}' already exists. Do you want to overwrite it? (y/n): ").strip().lower()
         if overwrite != 'y':
@@ -305,7 +394,7 @@ def new_record(index, name, phone, size, args):
     record = padd(encode_name(name), size-14) + phone_data
     return record
 
-def usim_write(reader_nb, records, pin, args):
+def usim_write(reader_nb, records, pin, setpin, args):
     written_records = 0
     (size, connection, num_records) = usim(reader_nb, pin)
 
@@ -361,19 +450,23 @@ def usim_write(reader_nb, records, pin, args):
     print(f"READY!\nSuccessfully written {written_records} records to SIM card.\n")
 
     
-    
+
 if __name__ == "__main__":
     print(message_Start)
+    print(f"Starting application...\n")
 
-    parser = argparse.ArgumentParser(description='Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.')
-    group = parser.add_mutually_exclusive_group(required=True)
+    parser = argparse.ArgumentParser(description='Read or write GSM phonebooks as CSV to/from a USIM card with a PC/SC compatible reader.')
+    
+    group = parser.add_mutually_exclusive_group()
     group.add_argument('-r', '--read', action='store_true', help='Read phonebook from the USIM card and save as CSV')
     group.add_argument('-w', '--write', action='store_true', help='Write CSV phonebook to the USIM card')
     group.add_argument('-rd', '--readdump', action='store_true', help='Write direct APDU responses (dump) as HEX-Bytes to CSV (bytewise backup)')
     group.add_argument('-wd', '--writedump', action='store_true', help='Write Dump: Write HEX-Bytes from (dumped) CSV to USIM card')
+
     parser.add_argument('-v', '--verbose', action='store_true', help='Show names & numbers during reading/writing')
-    parser.add_argument('-p', '--pin', type=int, help='PIN for the USIM card (default: None if omitted)', default=None)
-    parser.add_argument('csv_file', help='CSV file name for reading or writing')
+    parser.add_argument('-p', '--pin', type=int, help='PIN1 for the USIM card (default: None if omitted, but needed for --setpin / -sp !!)', default=None)
+    parser.add_argument('-sp', '--setpin', type=str, help='Can be ON/OFF or [NEW_PIN] (4 to 8 digits).\nCan be used standalone or in combination with read/write process.', default='')
+    parser.add_argument('csv_file', nargs='?', default='', help='CSV file name for reading or writing')
     parser.add_argument('reader_nb', type=int, nargs='?', default=0, help='Reader number (default: 0 if omitted)')
 
     if len(sys.argv) == 1:
@@ -384,15 +477,27 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if args.setpin:
+        if not args.pin:
+            print(f"\nERROR: No PIN provided. Please provide valid PIN.\nAborting operation.\n\n")
+            sys.exit(1)
+        if not (args.read or args.readdump or args.write or args.writedump):
+            usim(args.reader_nb, args.pin, args.setpin)
+
     if args.read or args.readdump:
-        usim_read(args.reader_nb, args.csv_file, args.pin, args)
-         
-    elif args.writedump or args.write:
+        if args.csv_file == '':
+            print(f"\nERROR: No filename for CSV provided. Please provide filename/path.\nAborting operation.\n\n")
+            sys.exit(1)
+        usim_read(args.reader_nb, args.csv_file, args.pin, args.setpin, args)
+    
+    if args.writedump or args.write:
         if not os.path.isfile(args.csv_file):
             print(f"\nERROR: The CSV file '{args.csv_file}' doesn't exist. Please check filename/path.\nAborting operation.\n\n")
             sys.exit(1)
-        records = get_records_from_csv(args.csv_file, args)        
+        records = get_records_from_csv(args.csv_file, args)
         if args.write:
-            usim_write(args.reader_nb, [(idx, name, phone) for idx, name, phone in records], args.pin, args)
+            usim_write(args.reader_nb, [(idx, name, phone) for idx, name, phone in records], args.pin, args.setpin, args)
         elif args.writedump:
-            usim_write(args.reader_nb, [(idx, data) for idx, data in records], args.pin, args)
+            usim_write(args.reader_nb, [(idx, data) for idx, data in records], args.pin, args.setpin, args)
+
+    print(message_End)
