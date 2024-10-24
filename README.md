@@ -15,22 +15,21 @@ Command line only. More to come. Perhaps. :)
 ***** SIMrw vX.X.X by Micha Salopek *****
 see: https://github.com/salopeknet/SIMrw
 
-usage: SIMrw.py [-h] (-r | -w | -rd | -wd) [-v] [-p PIN] csv_file [reader_nb]
-
-Read or write GSM phonebooks as CSV to/from a USIM card with an PC/SC compatible reader.
-
+usage: SIMrw_new (Releasefertig!).py [-h] [-r | -w | -rd | -wd] [-v] [-p PIN] [-sp SETPIN] [csv_file] [reader_nb]
+Read or write GSM phonebooks as CSV to/from a USIM card with a PC/SC compatible reader.
 positional arguments:
-  csv_file           CSV file name for reading or writing
-  reader_nb          Reader number (default: 0 if omitted)
-
+  csv_file              CSV file name for reading or writing
+  reader_nb             Reader number (default: 0 if omitted)
 options:
-  -h, --help         show this help message and exit
-  -r, --read         Read phonebook from the USIM card and save as CSV
-  -w, --write        Write CSV phonebook to the USIM card
-  -rd, --readdump    Write direct APDU responses (dump) as HEX-Bytes to CSV (bytewise backup)
-  -wd, --writedump   Write Dump: Write HEX-Bytes from (dumped) CSV to USIM card
-  -v, --verbose      Show names & numbers during reading/writing
-  -p PIN, --pin PIN  PIN for the USIM card (default: None if omitted)
+  -h, --help            show this help message and exit
+  -r, --read            Read phonebook from the USIM card and save as CSV
+  -w, --write           Write CSV phonebook to the USIM card
+  -rd, --readdump       Write direct APDU responses (dump) as HEX-Bytes to CSV (bytewise backup)
+  -wd, --writedump      Write Dump: Write HEX-Bytes from (dumped) CSV to USIM card
+  -v, --verbose         Show names & numbers during reading/writing
+  -p PIN, --pin PIN     PIN1 for the USIM card (default: None if omitted, but needed for --setpin / -sp !!)
+  -sp SETPIN, --setpin SETPIN
+                        Can be ON/OFF or [NEW_PIN] (4 to 8 digits). Can be used standalone or in combination with read/write process.
 ```
 
 ### Download & first run:
