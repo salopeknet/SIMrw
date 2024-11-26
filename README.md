@@ -15,7 +15,7 @@ Command line only. More to come. Perhaps. :)
 ***** SIMrw vX.X.X by Micha Salopek *****
 see: https://github.com/salopeknet/SIMrw
 
-usage: SIMrw_new (Releasefertig!).py [-h] [-r | -w | -rd | -wd] [-v] [-p PIN] [-sp SETPIN] [csv_file] [reader_nb]
+usage: SIMrw.py [-h] [-r | -w | -rd | -wd] [-v] [-p PIN] [-sp SETPIN] [csv_file] [reader_nb]
 Read or write GSM phonebooks as CSV to/from a USIM card with a PC/SC compatible reader.
 positional arguments:
   csv_file              CSV file name for reading or writing
