@@ -24,6 +24,14 @@ on:
         description: 'Build for Linux'
         type: boolean
         default: false
+      onedir:
+        description: 'Compile one-directory'
+        type: boolean
+        default: false
+      onefile:
+        description: 'Compile one-file'
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -36,4 +44,6 @@ jobs:
       macos: ${{ inputs.macos }}
       windows: ${{ inputs.windows }}
       linux: ${{ inputs.linux }}
+      onedir: ${{ inputs.onedir }}
+      onefile: ${{ inputs.onefile }}
       linux_apt_packages: "libpcsclite-dev python3-all-dev python3-setuptools swig"
